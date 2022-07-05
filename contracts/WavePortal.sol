@@ -9,6 +9,12 @@ contract WavePortal {
     uint256 private seed; // Generate a random number
     Wave[] waves; // Store an array of structs
 
+    /*
+     * Address => uint mapping, associate an address with a number!
+     * Storing the address with the last time the user waved at us.
+     */
+    mapping(address => uint256) public lastWavedAt;
+
     event NewWave(address indexed from, uint256 timestamp, string message);
 
     struct Wave {
@@ -28,6 +34,19 @@ contract WavePortal {
      */
 
     function wave(string memory _message) public {
+        /*
+         * Timestamp is at least 15-minutes bigger than the last timestamp we stored
+         */
+        require(
+            lastWavedAt[msg.sender] + 15 minutes < block.timestamp,
+            "Wait 15m"
+        );
+
+        /*
+         * Update the current timestamp we have for the user
+         */
+        lastWavedAt[msg.sender] = block.timestamp;
+        
         totalWaves += 1;
         console.log("%s waved w/ message %s", msg.sender, _message);
 
@@ -55,14 +74,6 @@ contract WavePortal {
         }
 
         emit NewWave(msg.sender, block.timestamp, _message);
-
-            uint256 prizeAmount = 0.0001 ether;
-        require(
-            prizeAmount <= address(this).balance,
-            "Trying to withdraw more money than the contract has."
-        );
-        (bool success, ) = (msg.sender).call{value: prizeAmount}("");
-        require(success, "Failed to withdraw money from contract.");
     }
 
     /*
