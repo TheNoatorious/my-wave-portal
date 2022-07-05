@@ -14,7 +14,7 @@ function App() {
   const [allWaves, setAllWaves] = useState([]);
   
 
-  const contractAddress = "0x418925dE540a4aFAE0DACc4BA8C4912c05f48dF1";
+  const contractAddress = "0xBe26aF2D8D842942A23552bCc57aF14CEE829712";
   const contractABI = wavePortal.abi;
   
   const { ethereum } = window;
@@ -52,8 +52,6 @@ function App() {
 
   const connectWallet = async () => {
     try {
-      const { ethereum } = window;
-
       if (!ethereum) {
         alert("Get MetaMask!");
         return;
@@ -100,29 +98,18 @@ function App() {
     try {
       if (ethereum) {
 
-        /*
-         * Call the getAllWaves method from your Smart Contract
-         */
+        // Call the getAllWaves method from the Smart Contract
         const waves = await wavePortalContract.getAllWaves();
 
-        /*
-         * We only need address, timestamp, and message in our UI so let's
-         * pick those out
-         */
-        let wavesCleaned = [];
-        waves.forEach(wave => {
-          wavesCleaned.push({
+        const wavesCleaned = waves.map(wave => {
+          return {
             address: wave.waver,
             timestamp: new Date(wave.timestamp * 1000),
-            message: wave.message
-          });
+            message: wave.message,
+          };
         });
-        
-        const waveTxn = await wavePortalContract.wave("this is a message")
 
-        /*
-         * Store our data in React State
-         */
+        // Store the data in React useState
         setAllWaves(wavesCleaned);
       } else {
         console.log("Ethereum object doesn't exist!")
@@ -137,12 +124,35 @@ function App() {
       setWave(data.toNumber());
   }
 
-  /*
-   * This runs our function when the page loads.
-   */
+  // Runs functions when the page loads
     useEffect( () => {
+      let wavePortalContract;
+
       checkWalletConnection();
       waveTotal();
+
+      const onNewWave = (from, timestamp, message) => {
+        console.log("NewWave", from, timestamp, message);
+        setAllWaves(prevState => [
+          ...prevState,
+          {
+            address: from,
+            timestamp: new Date(timestamp * 1000),
+            message: message,
+          },
+        ]);
+      };
+
+      if (ethereum) {
+        wavePortalContract.on("NewWave", onNewWave);
+      }
+      
+      return () => {
+        if (wavePortalContract) {
+          wavePortalContract.off("NewWave", onNewWave);
+        }
+      };
+
     }, [])
 
   return (
