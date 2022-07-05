@@ -14,7 +14,7 @@ function App() {
   const [allWaves, setAllWaves] = useState([]);
   
 
-  const contractAddress = "0xCc2304D1488fe6ebd3563FD6b8A7c80398Bb142E";
+  const contractAddress = "0x0C55E29dDD2C5A7E898868D673CA3F3AD7fDC1C4";
   const contractABI = wavePortal.abi;
   
   const { ethereum } = window;
