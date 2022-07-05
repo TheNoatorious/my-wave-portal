@@ -1,7 +1,6 @@
 const { hrtime } = require('process')
 
 const main = async () => {
-    const [owner, randomPerson] = await hre.ethers.getSigners();
     // compile the contract, files will show up in the artifacts dir
     const waveContractFactory = await hre.ethers.getContractFactory("WavePortal");
     // create local Ethereum network for this contract
@@ -11,26 +10,22 @@ const main = async () => {
 
     // give addy of the deployed contract
     console.log("Contract deployed to:", waveContract.address);
-    // check the address of the person deploying our contract
-    console.log("Contract deployed to:", owner.address);
-
 
     // manually call the functions as in a normal API
     let waveCount;
     waveCount = await waveContract.getTotalWaves();
 
-    let waveTxn = await waveContract.wave();
-    await waveTxn.wait();
+    console.log("Number of waves: ", waveCount.toNumber());
 
-    // check the count after you wave
-    waveCount = await waveContract.getTotalWaves();
+    let waveTxn = await waveContract.wave("A message!");
+    await waveTxn.wait(); // wait for the transaction to be mined
 
-    // another person waves
-    waveTxn = await waveContract.connect(randomPerson).wave();
-    await waveTxn.wait();
-
-    // check the count after random person waves
-    waveCount = await waveContract.getTotalWaves();
+    const [_, randomPerson] = await hre.ethers.getSigners();
+    waveTxn = await waveContract.connect(randomPerson).wave("Another message!");
+    await waveTxn.wait(); // Wait for the transaction to be mined
+  
+    let allWaves = await waveContract.getAllWaves();
+    console.log(allWaves);
 };
 
 const runMain = async() => {

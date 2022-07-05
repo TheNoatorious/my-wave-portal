@@ -11,9 +11,10 @@ function App() {
   */
   const [currentAccount, setCurrentAccount] = useState("");
   const [waveTotalCount, setWave] = useState(0);
+  const [allWaves, setAllWaves] = useState([]);
   
 
-  const contractAddress = "0x1a1110B51FD0568f80BBd9bc6d9f580Da803d746";
+  const contractAddress = "0xCc2304D1488fe6ebd3563FD6b8A7c80398Bb142E";
   const contractABI = wavePortal.abi;
   
   const { ethereum } = window;
@@ -43,7 +44,7 @@ function App() {
     if (accounts.length !== 0) {
         const account = accounts[0];
         console.log("Found an authorized account:", account);
-        setCurrentAccount(account)
+        setCurrentAccount(account);
       } else {
         console.log("No authorized account found")
       }
@@ -67,22 +68,21 @@ function App() {
     }
   }
 
-  const wave = async () => {
+  const wave = async (message) => {
     try {
 
       if (ethereum) {
-
-
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
 
       /*
       * Execute the actual wave from your smart contract
       */
-      const waveTxn = await wavePortalContract.wave();
+      const waveTxn = await wavePortalContract.wave(message, { gasLimit: 300000 });
       console.log("Mining...", waveTxn.hash);
 
       await waveTxn.wait();
+
       console.log("Mined -- ", waveTxn.hash);
 
       count = await wavePortalContract.getTotalWaves();
@@ -96,11 +96,45 @@ function App() {
     }
   }
 
-  const waveTotal = async () => {
+  const getAllWaves = async () => {
+    try {
+      if (ethereum) {
 
+        /*
+         * Call the getAllWaves method from your Smart Contract
+         */
+        const waves = await wavePortalContract.getAllWaves();
+
+        /*
+         * We only need address, timestamp, and message in our UI so let's
+         * pick those out
+         */
+        let wavesCleaned = [];
+        waves.forEach(wave => {
+          wavesCleaned.push({
+            address: wave.waver,
+            timestamp: new Date(wave.timestamp * 1000),
+            message: wave.message
+          });
+        });
+        
+        const waveTxn = await wavePortalContract.wave("this is a message")
+
+        /*
+         * Store our data in React State
+         */
+        setAllWaves(wavesCleaned);
+      } else {
+        console.log("Ethereum object doesn't exist!")
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const waveTotal = async () => {
     const data = await wavePortalContract.getTotalWaves();
       setWave(data.toNumber());
-
   }
 
   /*
@@ -127,6 +161,7 @@ function App() {
           <p>{ waveTotalCount }</p>
         </div>
 
+        <textarea name="textbox" placeholder="" id="" cols="30" rows="10"></textarea>
         <button className="wave__button" onClick={wave}>
           Wave at Me
         </button>
@@ -139,6 +174,15 @@ function App() {
             Connect Wallet
           </button>
         )}
+
+        {allWaves.map((wave, index) => {
+          return (
+            <div key={index} style={{ backgroundColor: "OldLace", marginTop: "16px", padding: "8px" }}>
+              <div>Address: {wave.address}</div>
+              <div>Time: {wave.timestamp.toString()}</div>
+              <div>Message: {wave.message}</div>
+            </div>)
+        })}
       </div>
     </div>
   );
