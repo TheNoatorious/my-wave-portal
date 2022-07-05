@@ -10,9 +10,18 @@ function App() {
   * Just a state variable we use to store our user's public wallet.
   */
   const [currentAccount, setCurrentAccount] = useState("");
+  const [waveTotalCount, setWave] = useState(0);
+  
 
   const contractAddress = "0x1a1110B51FD0568f80BBd9bc6d9f580Da803d746";
   const contractABI = wavePortal.abi;
+  
+  const { ethereum } = window;
+
+  const provider = new ethers.providers.Web3Provider(ethereum);
+  const signer = provider.getSigner();
+  
+  const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
 
   const checkWalletConnection = async () => {
     /*
@@ -58,32 +67,49 @@ function App() {
     }
   }
 
-  /*
-  * This runs our function when the page loads.
-  */
-  useEffect(() => {
-    checkWalletConnection();
-  }, [])
+  const wave = async () => {
+    try {
 
-    const wave = async () => {
-      try {
-        const { ethereum } = window;
+      if (ethereum) {
 
-        if (ethereum) {
-          const provider = new ethers.providers.Web3Provider(ethereum);
-          const signer = provider.getSigner();
-          
-          const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
 
-          let count = await wavePortalContract.getTotalWaves();
-          console.log("Retrieved total wave count...", count.toNumber());
-        } else {
-          console.log("Ethereum object doesn't exist!");
-        }
-      } catch (error) {
-        console.log(error);
+        let count = await wavePortalContract.getTotalWaves();
+        console.log("Retrieved total wave count...", count.toNumber());
+
+      /*
+      * Execute the actual wave from your smart contract
+      */
+      const waveTxn = await wavePortalContract.wave();
+      console.log("Mining...", waveTxn.hash);
+
+      await waveTxn.wait();
+      console.log("Mined -- ", waveTxn.hash);
+
+      count = await wavePortalContract.getTotalWaves();
+      console.log("Retrieved total wave count...", count.toNumber());
+
+      } else {
+        console.log("Ethereum object doesn't exist!");
       }
+    } catch (error) {
+      console.log(error);
+    }
   }
+
+  const waveTotal = async () => {
+
+    const data = await wavePortalContract.getTotalWaves();
+      setWave(data.toNumber());
+
+  }
+
+  /*
+   * This runs our function when the page loads.
+   */
+    useEffect( () => {
+      checkWalletConnection();
+      waveTotal();
+    }, [])
 
   return (
     <div className="main__container">
@@ -95,6 +121,10 @@ function App() {
 
         <div className="bio">
           Hi my name is Noa and I think Web3 is way more interesting than studying
+        </div>
+
+        <div>
+          <p>{ waveTotalCount }</p>
         </div>
 
         <button className="wave__button" onClick={wave}>
