@@ -12,9 +12,9 @@ function App() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [waveTotalCount, setWave] = useState(0);
   const [allWaves, setAllWaves] = useState([]);
-  
+  const [message, setMessage] = useState("");
 
-  const contractAddress = "0xBe26aF2D8D842942A23552bCc57aF14CEE829712";
+  const contractAddress = "0xA0D8fEB6d62f92D3deeF0EE4d08fb25EBDD22bc8";
   const contractABI = wavePortal.abi;
   
   const { ethereum } = window;
@@ -23,6 +23,7 @@ function App() {
   const signer = provider.getSigner();
   
   const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+  const textarea = document.getElementById('textbox');
 
   const checkWalletConnection = async () => {
     /*
@@ -61,6 +62,7 @@ function App() {
 
       console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
+      getAllWaves();
     } catch (error) {
       console.log(error)
     }
@@ -77,15 +79,18 @@ function App() {
       * Execute the actual wave from your smart contract
       */
       const waveTxn = await wavePortalContract.wave(message, { gasLimit: 300000 });
-      console.log("Mining...", waveTxn.hash);
 
+      // setMessage(message); // Set custom message
+
+      console.log("Mining...", waveTxn.hash);
       await waveTxn.wait();
 
       console.log("Mined -- ", waveTxn.hash);
 
       count = await wavePortalContract.getTotalWaves();
       console.log("Retrieved total wave count...", count.toNumber());
-
+    
+      getAllWaves();
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -119,41 +124,48 @@ function App() {
     }
   }
 
-  const waveTotal = async () => {
-    const data = await wavePortalContract.getTotalWaves();
-      setWave(data.toNumber());
-  }
-
-  // Runs functions when the page loads
-    useEffect( () => {
-      let wavePortalContract;
-
-      checkWalletConnection();
-      waveTotal();
-
-      const onNewWave = (from, timestamp, message) => {
-        console.log("NewWave", from, timestamp, message);
-        setAllWaves(prevState => [
-          ...prevState,
-          {
+  const onNewWave = (from, timestamp, message) => {
+    console.log("NewWave", from, timestamp, message);
+    setAllWaves((prevState) => [
+        ...prevState,
+        {
             address: from,
             timestamp: new Date(timestamp * 1000),
             message: message,
-          },
-        ]);
-      };
+        },
+    ]);
+  };
 
-      if (ethereum) {
-        wavePortalContract.on("NewWave", onNewWave);
-      }
-      
-      return () => {
-        if (wavePortalContract) {
-          wavePortalContract.off("NewWave", onNewWave);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (textarea.value === "") {
+      console.log("Message cannot be empty")
+    } else {
+      setMessage(e.target.value);
+      wave(message);
+      setMessage("");
+    }
+  }
+
+  // Runs functions when the page loads
+    useEffect(() => {
+      checkWalletConnection();
+    }, []);
+
+    useEffect(() => {
+        let wavePortalContract;
+
+        if (window.ethereum) {
+            wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+            wavePortalContract.on("NewWave", onNewWave);
         }
-      };
 
-    }, [])
+        return () => {
+            if (wavePortalContract) {
+                wavePortalContract.off("NewWave", onNewWave);
+            }
+        };
+    }, []);
 
   return (
     <div className="main__container">
@@ -171,10 +183,18 @@ function App() {
           <p>{ waveTotalCount }</p>
         </div>
 
-        <textarea name="textbox" placeholder="" id="" cols="30" rows="10"></textarea>
-        <button className="wave__button" onClick={wave}>
-          Wave at Me
-        </button>
+        <form onSubmit={handleSubmit}>
+          <textarea 
+            name="textbox"
+            id="textbox" 
+            placeholder="Type your message" 
+            cols="30" 
+            rows="10" 
+            value={message} 
+            onChange={(e) => { setMessage(e.target.value) }}
+          />
+          <input type="submit" value="Submit" />
+        </form>
 
         {/*
         * If there is no currentAccount render this button

@@ -35,7 +35,7 @@ contract WavePortal {
 
     function wave(string memory _message) public {
         /*
-         * Timestamp is at least 15-minutes bigger than the last timestamp we stored
+         * Timestamp is at least 30-seconds bigger than the last timestamp we stored
          */
         require(
             lastWavedAt[msg.sender] + 30 seconds < block.timestamp,
@@ -58,7 +58,7 @@ contract WavePortal {
         console.log("Random # generated: %d", seed);
 
         // Give a 50% chance that the user wins the prize.
-        if (seed < 50) {
+        if (seed <= 50) {
             console.log("%s won!", msg.sender);
 
             /*
