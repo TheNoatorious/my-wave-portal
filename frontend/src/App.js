@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import wavePortal from "./utils/WavePortal.json";
 import logo from './logo.svg';
-import './App.css';
+import './App.scss';
+import './assets/scss/style.scss';
 
 function App() {
 
@@ -139,8 +140,10 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (textarea.value === "") {
+      document.getElementsByClassName("input-container")[0].setAttribute("data-error", "Message can not be empty ):");
       console.log("Message cannot be empty")
     } else {
+      document.getElementsByClassName("input-container")[0].removeAttribute("data-error");
       setMessage(e.target.value);
       wave(message);
       setMessage("");
@@ -168,51 +171,61 @@ function App() {
     }, []);
 
   return (
-    <div className="main__container">
+    <div className="container">
+      <header>
+        <ul className="nav__items">
+          <li className="nav__item">Quasi</li>
+          <li className="nav__item">Architecto</li>
+          <li className="nav__item">Beatae</li>
+        </ul>
+      </header>
+      <div className="wave">
 
-      <div className="data__container">
-        <div className="header">
-          👋 Hey there!
+        <div className="wave__container">
+          <div className="wave__header">
+            <h1 className="wave__title">👋 Hey there!</h1>
+          </div>
+
+          <div className="wave__description">
+            Wave if you think Web3 is awesome
+          </div>
+
+          <form className="form" onSubmit={handleSubmit}>
+            <div className="input-container">
+              <textarea 
+                name="textbox"
+                className="form__textarea"
+                id="textbox" 
+                placeholder="Type your message" 
+                cols="30" 
+                rows="10" 
+                value={message} 
+                onChange={(e) => { setMessage(e.target.value) }}
+              />
+            </div>
+            <input type="submit" value="Submit" class="form__submit" />
+          </form>
+
+          {/*
+          * If there is no currentAccount render this button
+          */}
+          {!currentAccount && (
+            <button className="wave__button" onClick={connectWallet}>
+              Connect Wallet
+            </button>
+          )}
+
+          {allWaves.map((wave, index) => {
+            return (
+              <div key={index} className="card">
+                <div className="card__message">{wave.message}</div>
+                <div className="card__footer">
+                  <div className="card__address">From: {wave.address}</div>
+                  <div className="card__date">Time: {wave.timestamp.toString()}</div>
+                </div>
+              </div>)
+          })}
         </div>
-
-        <div className="bio">
-          Hi my name is Noa and I think Web3 is way more interesting than studying
-        </div>
-
-        <div>
-          <p>{ waveTotalCount }</p>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <textarea 
-            name="textbox"
-            id="textbox" 
-            placeholder="Type your message" 
-            cols="30" 
-            rows="10" 
-            value={message} 
-            onChange={(e) => { setMessage(e.target.value) }}
-          />
-          <input type="submit" value="Submit" />
-        </form>
-
-        {/*
-        * If there is no currentAccount render this button
-        */}
-        {!currentAccount && (
-          <button className="waveButton" onClick={connectWallet}>
-            Connect Wallet
-          </button>
-        )}
-
-        {allWaves.map((wave, index) => {
-          return (
-            <div key={index} style={{ backgroundColor: "OldLace", marginTop: "16px", padding: "8px" }}>
-              <div>Address: {wave.address}</div>
-              <div>Time: {wave.timestamp.toString()}</div>
-              <div>Message: {wave.message}</div>
-            </div>)
-        })}
       </div>
     </div>
   );
