@@ -171,13 +171,27 @@ function App() {
     }, []);
 
   return (
-    <div className="container">
+    <div className="content">
+      
       <header>
-        <ul className="nav__items">
-          <li className="nav__item">Quasi</li>
-          <li className="nav__item">Architecto</li>
-          <li className="nav__item">Beatae</li>
-        </ul>
+        
+          <nav>
+            <ul className="nav__items">
+              <li className="nav__item">Quasi</li>
+              <li className="nav__item">Architecto</li>
+              <li className="nav__item">Beatae</li>
+            </ul>
+
+          {/*
+            * If there is no currentAccount render this button
+            */}
+
+            {!currentAccount
+              ? <button className="btn btn--secondary" onClick={connectWallet}><span className="icon icon--red">&bull;</span>Connect Wallet</button>
+              : <button className="btn btn--secondary"><span className="icon icon--green">&bull;</span>Connected</button>
+            }
+          </nav>
+        
       </header>
       <div className="wave">
 
@@ -205,15 +219,6 @@ function App() {
             </div>
             <input type="submit" value="Submit" class="form__submit" />
           </form>
-
-          {/*
-          * If there is no currentAccount render this button
-          */}
-          {!currentAccount && (
-            <button className="wave__button" onClick={connectWallet}>
-              Connect Wallet
-            </button>
-          )}
 
           {allWaves.map((wave, index) => {
             return (
