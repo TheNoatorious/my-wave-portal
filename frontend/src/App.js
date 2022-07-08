@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import wavePortal from "./utils/WavePortal.json";
-import logo from './logo.svg';
 import './App.scss';
 import './assets/scss/style.scss';
 
@@ -149,28 +148,26 @@ function App() {
     }
   }
 
-  // Runs functions when the page loads
-    useEffect(() => {
+  useEffect(() => { // Run functions when the page loads
+      let wavePortalContract;
+
       checkWalletConnection();
-    }, []);
+      getAllWaves();
 
-    useEffect(() => {
-        let wavePortalContract;
+      if (window.ethereum) {
+          wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+          wavePortalContract.on("NewWave", onNewWave);
+      }
 
-        if (window.ethereum) {
-            wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-            wavePortalContract.on("NewWave", onNewWave);
-        }
-
-        return () => {
-            if (wavePortalContract) {
-                wavePortalContract.off("NewWave", onNewWave);
-            }
-        };
-    }, []);
+      return () => {
+          if (wavePortalContract) {
+              wavePortalContract.off("NewWave", onNewWave);
+          }
+      };
+  }, []);
 
   return (
-    <div className="content">
+    <div className="root__container">
       <header>
         <div className="container">
           <nav>
@@ -190,7 +187,6 @@ function App() {
                 }
               </li>
             </ul>
-
 
           </nav>
       
@@ -224,13 +220,18 @@ function App() {
                 <input type="submit" value="Wave" className="form__submit" />
                 </div>
               </form>
+              <div className="wave__footer">
+                <div className="container">
+                  <p>Powered by <a href="https://twitter.com/_buildspace" target="_blank" rel="noreferrer">Buildspace</a> | Goerli Test Network</p>
+                </div>
+              </div>
             </div>
           </div>
           <div className="cards">
-          
+            {!currentAccount ? <div className="cards__feedback"x>Wallet not connected</div> : <div className="cards__feedback">Messages</div> }
+
             {allWaves.slice(0).reverse().map((wave, index) => {
               return (
-                
                 <div key={index} className="card">
                   <h3 className="card__message">{wave.message}</h3>
                   <div className="card__footer">
@@ -243,7 +244,7 @@ function App() {
             
           </div>
         </div>
-
+    
     </div>
   );
 }

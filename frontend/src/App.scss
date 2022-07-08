@@ -83,48 +83,6 @@ nav {
   }
 }
 
-.icon--green {
-  color: #2ecc71;
-}
-
-.icon--red {
-  color: #ff4757;
-}
-
-.icon--round {
-  box-shadow: 3px 3px 0 0 #000;
-  padding: .8rem;
-  border-radius: 100%;
-  border: 2px solid #000;
-  height: 45px;
-  width: 45px;
-  box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.45);
-  transition: .3s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.7);
-    box-shadow: 0px 0px 0 0 transparent;
-    transition: .3s;
-  }
-}
-
-.icon--twitter {
-    background: url("./assets/img/twitter-icon.svg") no-repeat;
-    background-size: contain;
-    width: 16px;
-    height: 16px;
-    margin: 0 auto;
-}
-
-.icon--etherscan {
-    background: url("./assets/img/etherscan-icon.svg") no-repeat;
-    background-size: contain;
-    width: 16px;
-    height: 16px;
-    margin-right: 0;
-}
-
 .container {
 	max-width: 1320px;
 	padding: 0 20px;
@@ -159,32 +117,6 @@ nav {
   }
 }
 
-.cards {
-  height: auto;
-  width: 543px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  overflow-x: scroll;
-  margin-top: 4.5rem;
-
-  &::-webkit-scrollbar {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent; 
-  }
-   
-  &::-webkit-scrollbar-thumb {
-    background: url("./assets/img/arrows.svg") no-repeat; 
-    width: 89px;
-    height: 37px;
-    background-size: contain;
-    border-radius: 10px;
-  }
-}
-
 .wave {
   flex-direction: row;
   justify-content: flex-end;
@@ -200,11 +132,11 @@ nav {
     text-align: center;
   }
 }
+
 .form {
   display: flex;
   flex-direction: column;
   border: 2px solid #000;
-  // padding: 2rem;
   box-shadow: 10px 10px 0 0 #000;
   background: rgb(255 255 255 / 75%);
 
@@ -264,6 +196,46 @@ nav {
 
 }
 
+.cards {
+  height: auto;
+  width: 543px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-x: scroll;
+  margin-top: 4.5rem;
+  min-height: 6rem;
+
+  &::-webkit-scrollbar {
+    background: transparent;
+    margin-left: 4rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent; 
+    margin-left: 2rem;
+  }
+   
+  &::-webkit-scrollbar-thumb {
+    background: url("./assets/img/arrows.svg") no-repeat; 
+    width: 89px;
+    height: 37px;
+    background-size: contain;
+    border-radius: 10px;
+  }
+
+  .cards__feedback {
+    margin: 0 auto;
+    padding: 1rem;
+    text-align: center;
+    text-transform: uppercase;
+    font-style: italic;
+    border: 2px solid #000;
+    box-shadow: 10px 10px 0 0 #000;
+    background: rgb(255 255 255 / 30%);
+  }
+}
+
 .card {
   background-color: oldlace;
   border: 1px solid #000;
@@ -283,4 +255,62 @@ nav {
     padding: 2rem;
     font-size: 10px;
   }
+}
+
+.wave__footer {
+  font-size: 10px;
+  text-align: center;
+  margin-top: 2rem;
+  color: #9d9b94;
+
+  a {
+    color: #9d9b94;
+  }
+}
+
+// ================================================
+// MODIFIERS
+// ================================================
+
+.icon--green {
+  color: #2ecc71;
+}
+
+.icon--red {
+  color: #ff4757;
+}
+
+.icon--round {
+  box-shadow: 3px 3px 0 0 #000;
+  padding: .8rem;
+  border-radius: 100%;
+  border: 2px solid #000;
+  height: 45px;
+  width: 45px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.45);
+  transition: .3s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: 0px 0px 0 0 transparent;
+    transition: .3s;
+  }
+}
+
+
+.icon--twitter {
+  background: url("./assets/img/twitter-icon.svg") no-repeat;
+  background-size: contain;
+  width: 16px;
+  height: 16px;
+  margin: 0 auto;
+}
+
+.icon--etherscan {
+  background: url("./assets/img/etherscan-icon.svg") no-repeat;
+  background-size: contain;
+  width: 16px;
+  height: 16px;
+  margin-right: 0;
 }
