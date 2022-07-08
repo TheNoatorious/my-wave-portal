@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Slider from "react-slick";
 import { ethers } from "ethers";
 import wavePortal from "./utils/WavePortal.json";
 import logo from './logo.svg';
