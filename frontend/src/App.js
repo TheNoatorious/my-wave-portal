@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Slider from "react-slick";
 import { ethers } from "ethers";
 import wavePortal from "./utils/WavePortal.json";
 import logo from './logo.svg';
@@ -11,7 +12,6 @@ function App() {
   * Just a state variable we use to store our user's public wallet.
   */
   const [currentAccount, setCurrentAccount] = useState("");
-  const [waveTotalCount, setWave] = useState(0);
   const [allWaves, setAllWaves] = useState([]);
   const [message, setMessage] = useState("");
 
@@ -81,12 +81,13 @@ function App() {
       */
       const waveTxn = await wavePortalContract.wave(message, { gasLimit: 300000 });
 
-      // setMessage(message); // Set custom message
+      setMessage("");
 
       console.log("Mining...", waveTxn.hash);
       await waveTxn.wait();
 
       console.log("Mined -- ", waveTxn.hash);
+
 
       count = await wavePortalContract.getTotalWaves();
       console.log("Retrieved total wave count...", count.toNumber());
@@ -146,7 +147,6 @@ function App() {
       document.getElementsByClassName("input-container")[0].removeAttribute("data-error");
       setMessage(e.target.value);
       wave(message);
-      setMessage("");
     }
   }
 
@@ -172,66 +172,79 @@ function App() {
 
   return (
     <div className="content">
-      
       <header>
-        
+        <div className="container">
           <nav>
+            <div className="logo">My Wave Portal</div>
             <ul className="nav__items">
-              <li className="nav__item">Quasi</li>
-              <li className="nav__item">Architecto</li>
-              <li className="nav__item">Beatae</li>
+              <li className="nav__item"><a href="https://twitter.com/thenoatorious" target="_blank" rel="noreferrer" className="icon--round" title="Twitter"><span className="icon icon--twitter"></span></a></li>
+              <li className="nav__item"><a href="https://goerli.etherscan.io/address/0xA0D8fEB6d62f92D3deeF0EE4d08fb25EBDD22bc8" target="_blank" rel="noreferrer" className="icon--round" title="Etherscan"><span className="icon icon--etherscan"></span></a></li>
+              <li className="nav__item">            
+                {
+                 /*
+                  * If there is no currentAccount render this button
+                  */
+                }
+                {!currentAccount
+                  ? <div className="btn btn--secondary" onClick={connectWallet}><span className="icon icon--red">&bull;</span>Connect Wallet</div>
+                  : <div className="btn btn--secondary"><span className="icon icon--green">&bull;</span>Connected</div>
+                }
+              </li>
             </ul>
 
-          {/*
-            * If there is no currentAccount render this button
-            */}
 
-            {!currentAccount
-              ? <button className="btn btn--secondary" onClick={connectWallet}><span className="icon icon--red">&bull;</span>Connect Wallet</button>
-              : <button className="btn btn--secondary"><span className="icon icon--green">&bull;</span>Connected</button>
-            }
           </nav>
-        
+      
+          </div>
       </header>
-      <div className="wave">
+        <div className="wave">
+          <div className="wave__container">
+            <div className="wave__content">
+              <div className="wave__header">
+                <h1 className="wave__title">👋 Hey there!</h1>
+              </div>
 
-        <div className="wave__container">
-          <div className="wave__header">
-            <h1 className="wave__title">👋 Hey there!</h1>
-          </div>
-
-          <div className="wave__description">
-            Wave if you think Web3 is awesome
-          </div>
-
-          <form className="form" onSubmit={handleSubmit}>
-            <div className="input-container">
-              <textarea 
-                name="textbox"
-                className="form__textarea"
-                id="textbox" 
-                placeholder="Type your message" 
-                cols="30" 
-                rows="10" 
-                value={message} 
-                onChange={(e) => { setMessage(e.target.value) }}
-              />
-            </div>
-            <input type="submit" value="Submit" class="form__submit" />
-          </form>
-
-          {allWaves.map((wave, index) => {
-            return (
-              <div key={index} className="card">
-                <div className="card__message">{wave.message}</div>
-                <div className="card__footer">
-                  <div className="card__address">From: {wave.address}</div>
-                  <div className="card__date">Time: {wave.timestamp.toString()}</div>
+              <form className="form" onSubmit={handleSubmit}>
+                <div className="form__header">
+                  Wave if you think Web3 is awesome
                 </div>
-              </div>)
-          })}
+
+                <div className="form__inner">
+                <div className="input-container">
+                  <textarea 
+                    name="textbox"
+                    className="form__textarea"
+                    id="textbox" 
+                    placeholder="Type your message" 
+                    cols="30" 
+                    rows="10" 
+                    value={message} 
+                    onChange={(e) => { setMessage(e.target.value) }}
+                  />
+                </div>
+                <input type="submit" value="Wave" className="form__submit" />
+                </div>
+              </form>
+            </div>
+          </div>
+          <div className="cards">
+          
+            {allWaves.slice(0).reverse().map((wave, index) => {
+              return (
+                
+                <div key={index} className="card">
+                  <h3 className="card__message">{wave.message}</h3>
+                  <div className="card__footer">
+                    <div className="card__address">From: {wave.address}</div>
+                    <div className="card__date">Time: {wave.timestamp.toString()}</div>
+                  </div>
+                </div>
+                )
+            })}
+            
+          </div>
         </div>
-      </div>
+
     </div>
   );
 }
